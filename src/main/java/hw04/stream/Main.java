@@ -15,48 +15,12 @@ public class Main {
         populateAuthors();
         populateBooks();
 
-        System.out.print("1. Average author age (years): ");
-        int averageAge = authors.values().stream()
-                .collect(averagingInt(Author::getAge))
-                .intValue();
-        System.out.println(averageAge + "\n");
-
-        System.out.println("2. The list of authors sorted by age in ascending order:");
-        System.out.println(authors.values().stream()
-                .sorted(Comparator.comparing(Author::getAge))
-                .map(Author::getName)
-                .collect(joining(", ")) + "\n");
-
-        System.out.println("3. The list of retirees among authors:");
-        System.out.println(authors.values().stream()
-                .filter(author -> (author.getGender().equals(Gender.MALE) && author.getAge() > 65)
-                        || (author.getGender().equals(Gender.FEMALE) && author.getAge() > 63))
-                .map(Author::getName)
-                .collect(joining(", ")));
-
-        System.out.println("\n\n4. Book | Years since the publication date:");
-        books.forEach(book -> System.out.print(book.getName() + " | "
-                + ChronoUnit.YEARS.between(LocalDate.ofYearDay(book.getYearOfPublication(),
-                1), LocalDate.now()) + "\n"));
-
-        System.out.println("\n\n5. Authors who wrote collaboratively:");
-        Set<Author> coAuthors = books.stream()
-                .filter(book -> book.getAuthors().size() > 1)
-                .collect(flatMapping(book -> book.getAuthors().stream(), toSet()));
-        System.out.println(coAuthors.stream().map(Author::getName).collect(joining(",")));
-
-        Map<Author, List<Book>> booksByAuthor = books.stream()
-                .flatMap(book -> book.getAuthors().stream())
-                .distinct()
-                .collect(toMap(Function.identity(), author -> books.stream()
-                        .filter(book -> book.getAuthors().contains(author))
-                        .collect(toList())));
-
-        booksByAuthor.forEach((author, books) -> {
-            System.out.println("Author: " + author.getName());
-            System.out.println("Books: " + books.stream().map(Book::getName).collect(joining(" | ")));
-            System.out.println();
-        });
+        printAuthorAverageAge();
+        printAuthorsSortedByAge();
+        printRetirees();
+        printBookNamesAndPublicationDates();
+        printCoAuthors();
+        printBooksByAuthor();
     }
 
     private static void populateAuthors() {
@@ -103,5 +67,59 @@ public class Main {
                 Arrays.asList(authors.get("Ilf"), authors.get("Petrov"))));
         books.add(new Book("Harry Potter and the Goblet of Fire", 2000,
                 Arrays.asList(authors.get("Rowling"))));
+    }
+
+    private static void printAuthorAverageAge() {
+        System.out.print("1. Average author age (years): ");
+        int averageAge = authors.values().stream()
+                .collect(averagingInt(Author::getAge))
+                .intValue();
+        System.out.println(averageAge + "\n");
+    }
+
+    private static void printAuthorsSortedByAge() {
+        System.out.println("2. The list of authors sorted by age in ascending order:");
+        System.out.println(authors.values().stream()
+                .sorted(Comparator.comparing(Author::getAge))
+                .map(Author::getName)
+                .collect(joining(", ")) + "\n");
+    }
+
+    private static void printRetirees() {
+        System.out.println("3. The list of retirees among authors:");
+        System.out.println(authors.values().stream()
+                .filter(Author::isAlive)
+                .filter(author -> (author.getGender().equals(Gender.MALE) && author.getAge() > 65)
+                        || (author.getGender().equals(Gender.FEMALE) && author.getAge() > 63))
+                .map(Author::getName)
+                .collect(joining(", ")));
+    }
+
+    private static void printBookNamesAndPublicationDates() {
+        System.out.println("\n4. Book | Years since the publication date:");
+        books.forEach(book -> System.out.print(book.getName() + " | "
+                + ChronoUnit.YEARS.between(LocalDate.ofYearDay(book.getYearOfPublication(),
+                1), LocalDate.now()) + "\n"));
+    }
+
+    private static void printCoAuthors() {
+        System.out.println("\n5. Authors who wrote collaboratively:");
+        Set<Author> coAuthors = books.stream()
+                .flatMap(book -> book.getAuthors().stream().filter(a -> book.getAuthors().size() > 1))
+                .collect(toSet());
+        System.out.println(coAuthors.stream().map(Author::getName).collect(joining(", ")));
+    }
+
+    private static void printBooksByAuthor() {
+        Map<Author, List<Book>> booksByAuthor = books.stream()
+                .flatMap(book -> book.getAuthors().stream().map(author -> new AbstractMap.SimpleEntry<>(author, book)))
+                .collect(groupingBy(Map.Entry::getKey, mapping(Map.Entry::getValue, toList())));
+
+        System.out.print("\n6. ");
+        booksByAuthor.forEach((author, books) -> {
+            System.out.println("Author: " + author.getName());
+            System.out.println("Books: " + books.stream().map(Book::getName).collect(joining(" | ")));
+            System.out.println();
+        });
     }
 }

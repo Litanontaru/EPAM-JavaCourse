@@ -7,7 +7,7 @@ public class Author {
     private final String name;
     private final LocalDate birthDate;
     private LocalDate deathDate;
-    private Gender gender;
+    private final Gender gender;
 
     public Author(String name, Gender gender, LocalDate birthDate) {
         this.name = name;
@@ -33,9 +33,6 @@ public class Author {
     }
 
     public LocalDate getDeathDate() {
-        if (deathDate == null) {
-            System.out.println("The author is alive!");
-        }
         return deathDate;
     }
 
@@ -45,5 +42,9 @@ public class Author {
 
     public void setDeathDate(LocalDate deathDate) {
         this.deathDate = deathDate;
+    }
+
+    public boolean isAlive() {
+        return getDeathDate() == null;
     }
 }
