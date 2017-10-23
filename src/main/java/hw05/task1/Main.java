@@ -1,24 +1,22 @@
 package hw05.task1;
 
-import hw05.task1.bank.BankOne;
-import hw05.task1.bank.BankTwo;
-
 public class Main {
-    public static void main(String[] args) {
-        BankOne bank1 = new BankOne(13447);
-        BankTwo bank2 = new BankTwo(13447);
+    public static void main(String[] args) throws InterruptedException {
+        System.out.println(">>>System synchronization:<<<");
+        Thread.sleep(1000);
+        Bank bank = new Bank(13447);
 
         for (int i = 0; i < 10000; i++) {
-            Thread t = new Thread(new BankUser(bank1));
+            Thread t = new Thread(new BankUserOne(bank));
             t.start();
         }
 
-        System.out.println();
-        System.out.println();
-        System.out.println();
+        System.out.println("\n\n\n>>>Program synchronization:<<<");
+        Thread.sleep(1000);
+        bank = new Bank(13447);
 
         for (int i = 0; i < 10000; i++) {
-            Thread t = new Thread(new BankUser(bank2));
+            Thread t = new Thread(new BankUserTwo(bank));
             t.start();
         }
     }
