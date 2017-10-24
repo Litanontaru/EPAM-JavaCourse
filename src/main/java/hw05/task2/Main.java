@@ -7,14 +7,19 @@ public class Main {
     private static List<Philosopher> philosophers = new ArrayList<>();
     private static List<Fork> forks = new ArrayList<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         populateForks();
         populatePhilosophers();
 
-        for (Philosopher p : philosophers) {
-            Thread t = new Thread(p);
-            t.start();
+        List<Thread> threads = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            threads.add(new Thread(philosophers.get(i)));
         }
+        threads.forEach(Thread::start);
+        Thread.sleep(10000);
+        threads.forEach(Thread::interrupt);
+
+        philosophers.forEach(p -> System.out.println(p.eaten));
     }
 
     private static void populateForks() {
@@ -30,6 +35,4 @@ public class Main {
         philosophers.add(new Philosopher(4, forks.get(3), forks.get(4)));
         philosophers.add(new Philosopher(5, forks.get(4), forks.get(0)));
     }
-
-
 }

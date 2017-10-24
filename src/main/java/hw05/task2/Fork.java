@@ -4,13 +4,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Fork {
-    private final Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock(true);
 
-    public synchronized void lock() {
-        lock.lock();
+    public boolean pickUp() {
+        return lock.tryLock();
     }
 
-    public synchronized void unlock() {
+    public void putDown() {
         lock.unlock();
     }
 }
