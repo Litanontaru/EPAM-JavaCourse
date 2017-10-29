@@ -9,11 +9,13 @@ public class LockPhilosopher extends Philosopher implements Runnable {
 
     @Override
     public void run() {
+        //лучше просто поставить true в условии и ловить InterruptedException
         while (!Thread.currentThread().isInterrupted()) {
             think();
             if (leftFork.pickUp()) {
                 if (rightFork.pickUp()) {
                     eat();
+                    //обычно такие операции, как release делают в секции finally, чтобы гарантированно отпускать
                     leftFork.putDown();
                     rightFork.putDown();
                 } else {

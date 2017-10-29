@@ -17,6 +17,7 @@ public class BankUserTwo implements Runnable {
                 bank.unlock();
                 break;
             }
+            //обычно такие операции, как release делают в секции finally, чтобы гарантированно отпускать
             bank.unlock();
         }
     }
